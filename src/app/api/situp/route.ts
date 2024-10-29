@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     const caloriesPerPushUp = calculateCaloriesPerPushUp(weight);
     const totalCalories: number = calculateTotalCalories(weight, sitUps);
 
-    const pushUp = await insertPushUpInfo(data, totalCalories);
+    await insertPushUpInfo(data, totalCalories);
 
     // Response sukses
     return NextResponse.json(

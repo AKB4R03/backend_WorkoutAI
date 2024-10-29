@@ -26,7 +26,7 @@ export const insertPushUpInfo = async (
   const key = Object.keys(woData)[1]; // Mendapatkan kunci pertama
   const value = woData[key]; // Mengambil nilai dari kunci pertama
 
-  let data = {
+  const data = {
     woName: key, // Mengatur woName sesuai dengan nilai dari kunci pertama
     sumWo: value,
     totalCalories: totalCalories.toFixed(3),
