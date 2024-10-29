@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         statusCode: 200,
-        Kalori_yang_terbakar_per_sit_up: caloriesPerPushUp.toFixed(3),
+        Kalori_yang_terbakar_per_sit_up: caloriesPerPushUp.toFixed(2),
         Total_kalori_yang_terbakar: totalCalories.toFixed(1),
       },
       { status: 200 }
