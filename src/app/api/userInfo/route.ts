@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
   try {
     const data: UserInfoModel = await request.json();
 
-    const user = await insertUserInfo(data);
+    await insertUserInfo(data);
 
     if (
       typeof data.username !== "string" ||

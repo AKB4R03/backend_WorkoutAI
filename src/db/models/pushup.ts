@@ -1,4 +1,4 @@
-import { Db, ObjectId } from "mongodb";
+import { Db } from "mongodb";
 import { getMongoClientInstance } from "../config";
 
 type PushUpInfoModel = {
