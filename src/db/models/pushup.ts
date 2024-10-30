@@ -1,4 +1,4 @@
-import { Db } from "mongodb";
+import { Db, ObjectId } from "mongodb";
 import { getMongoClientInstance } from "../config";
 
 type PushUpInfoModel = {
@@ -18,7 +18,8 @@ export const getDb = async () => {
 
 export const insertPushUpInfo = async (
   woData: PushUpInfoModel,
-  totalCalories: number
+  totalCalories: number,
+  userId: string
 ) => {
   const db = await getDb();
 
@@ -30,9 +31,23 @@ export const insertPushUpInfo = async (
     woName: key, // Mengatur woName sesuai dengan nilai dari kunci pertama
     sumWo: value,
     totalCalories: totalCalories.toFixed(3),
+    userId: new ObjectId(userId),
   };
 
   const result = await db.collection(COLLECTION_NAME).insertOne(data);
+
+  return result;
+};
+
+export const getWoInfo = async (userId: string) => {
+  const db = await getDb();
+
+  const result = await db
+    .collection(COLLECTION_NAME)
+    .aggregate([{ $match: { userId: new ObjectId(userId) } }])
+    .toArray();
+
+  // console.log(result, "++ cart ++");
 
   return result;
 };

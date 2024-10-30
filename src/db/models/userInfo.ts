@@ -1,9 +1,11 @@
 import { Db } from "mongodb";
 import { getMongoClientInstance } from "../config";
+import { hash } from "../utils/bcrypt";
 
 type UserInfoModel = {
   username: string;
   email: string;
+  password: string;
   height: number;
   weight: number;
 };
@@ -19,8 +21,20 @@ export const getDb = async () => {
 };
 
 export const insertUserInfo = async (user: UserInfoModel) => {
+  const modifUser: UserInfoModel = {
+    ...user,
+    password: hash(user.password),
+  };
+
   const db = await getDb();
-  const result = await db.collection(COLLECTION_NAME).insertOne(user);
+  const result = await db.collection(COLLECTION_NAME).insertOne(modifUser);
 
   return result;
+};
+
+export const getUserByEmail = async (email: string) => {
+  const db = await getDb();
+  const user = await db.collection(COLLECTION_NAME).findOne({ email: email });
+
+  return user;
 };

@@ -1,12 +1,22 @@
 import { insertUserInfo } from "@/db/models/userInfo";
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
 
 type UserInfoModel = {
   username: string;
   email: string;
+  password: string;
   height: number;
   weight: number;
 };
+
+const userInputSchema = z.object({
+  username: z.string(),
+  email: z.string().email(),
+  password: z.string().min(5),
+  height: z.number(),
+  weight: z.number(),
+});
 
 type MyResponse = {
   statusCode: number;
@@ -19,19 +29,28 @@ export async function POST(request: NextRequest) {
   try {
     const data: UserInfoModel = await request.json();
 
+    const parsedData = userInputSchema.safeParse(data);
+
+    if (!parsedData.success) {
+      throw parsedData.error;
+    }
+
     await insertUserInfo(data);
 
-    if (
-      typeof data.username !== "string" ||
-      typeof data.email !== "string" ||
-      typeof data.height !== "number" ||
-      typeof data.weight !== "number"
-    ) {
+    return NextResponse.json<MyResponse>({
+      statusCode: 201,
+      message: "succeed save user info",
+    });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      console.log(error);
+      const errorPath = error.issues[0].path[0];
+      const errorMessage = error.issues[0].message;
+
       return NextResponse.json<MyResponse>(
         {
           statusCode: 400,
-          message: "Invalid input data types",
-          error: "Validation error",
+          error: `${errorPath} - ${errorMessage}`,
         },
         {
           status: 400,
@@ -39,11 +58,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json<MyResponse>({
-      statusCode: 201,
-      message: "succeed save user info",
-    });
-  } catch (error) {
     console.log(error, "=== error ===");
     return NextResponse.json(
       {
