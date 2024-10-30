@@ -9,6 +9,18 @@ type Data = {
 
 export async function POST(request: NextRequest) {
   try {
+    const userId = request.headers.get("x-user-id");
+
+    if (!userId || userId.length !== 24) {
+      return NextResponse.json(
+        {
+          statusCode: 400,
+          message: "Invalid or missing user ID.",
+        },
+        { status: 400 }
+      );
+    }
+
     // Parsing JSON dengan type assertion ke tipe Data
     const data: Data = await request.json();
     console.log("Received data:", data);
@@ -45,7 +57,7 @@ export async function POST(request: NextRequest) {
     const caloriesPerPushUp = calculateCaloriesPerPushUp(weight);
     const totalCalories: number = calculateTotalCalories(weight, sitUps);
 
-    await insertPushUpInfo(data, totalCalories);
+    await insertPushUpInfo(data, totalCalories, userId);
 
     // Response sukses
     return NextResponse.json(
