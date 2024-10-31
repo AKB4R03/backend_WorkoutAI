@@ -6,7 +6,7 @@ export async function DELETE() {
   try {
     const cookieStore = await cookies();
     cookieStore.delete("token");
-    await deleteAllDocuments();
+    // await deleteAllDocuments();
     return NextResponse.json({
       statusCode: 200,
       message: "Logout successful, token deleted",
