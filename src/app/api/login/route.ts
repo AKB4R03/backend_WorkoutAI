@@ -60,6 +60,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       statusCode: 200,
       message: "Success login",
+      token: token,
     });
   } catch (error) {
     console.log(error, "==== err");
