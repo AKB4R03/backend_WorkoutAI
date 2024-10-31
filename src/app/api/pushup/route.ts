@@ -1,4 +1,5 @@
 import { insertPushUpInfo } from "@/db/models/pushup";
+import { getUserWeightById } from "@/db/models/userInfo";
 import { NextRequest, NextResponse } from "next/server";
 
 // Definisikan tipe data untuk request body
@@ -21,11 +22,13 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+    const weight = await getUserWeightById(userId);
 
+    console.log(weight, "===== weigth");
     const data: Data = await request.json();
     console.log("Received data:", data);
 
-    const { weight, pushUps } = data;
+    const { pushUps } = data;
 
     // Validasi data input
     if (typeof weight !== "number" || typeof pushUps !== "number") {
