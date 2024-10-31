@@ -1,4 +1,4 @@
-import { Db, ObjectId } from "mongodb";
+import { Db, MongoClient, ObjectId } from "mongodb";
 import { getMongoClientInstance } from "../config";
 
 type PushUpInfoModel = {
@@ -24,13 +24,13 @@ export const insertPushUpInfo = async (
   const db = await getDb();
 
   // Ambil kunci pertama dari woData
-  const key = Object.keys(woData)[1]; // Mendapatkan kunci pertama
+  const key = Object.keys(woData)[0]; // Mendapatkan kunci pertama
   const value = woData[key]; // Mengambil nilai dari kunci pertama
 
   const data = {
     woName: key, // Mengatur woName sesuai dengan nilai dari kunci pertama
     sumWo: value,
-    totalCalories: totalCalories.toFixed(3),
+    totalCalories: totalCalories.toFixed(1),
     userId: new ObjectId(userId),
   };
 
@@ -51,3 +51,22 @@ export const getWoInfo = async (userId: string) => {
 
   return result;
 };
+
+export async function deleteAllDocuments() {
+  const uri =
+    "mongodb+srv://masakbar2905:mei555@cluster0.ratubnl.mongodb.net/?retryWrites=true&w=majority"; // Ganti dengan URI Anda
+  const client = new MongoClient(uri);
+
+  try {
+    await client.connect();
+    const database = client.db("Workout_AI"); // Ganti dengan nama database Anda
+    const collection = database.collection("workOutInfo"); // Ganti dengan nama collection Anda
+
+    const result = await collection.deleteMany({});
+    console.log(`${result.deletedCount} documents were deleted.`);
+  } finally {
+    await client.close();
+  }
+}
+
+deleteAllDocuments().catch(console.error);

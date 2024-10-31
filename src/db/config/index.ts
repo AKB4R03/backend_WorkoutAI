@@ -3,7 +3,6 @@ import { MongoClient } from "mongodb";
 // console.log(process.env.MONGODB_CONNECTION_STRING);
 
 const connectionDb = process.env.MONGODB_URI;
-
 if (!connectionDb) {
   throw new Error("MONGODB_CONNECTION_STRING is not defined");
 }
