@@ -1,4 +1,4 @@
-import { Db, MongoClient, ObjectId } from "mongodb";
+import { Db, ObjectId } from "mongodb";
 import { getMongoClientInstance } from "../config";
 
 type PushUpInfoModel = {
@@ -27,11 +27,15 @@ export const insertPushUpInfo = async (
   const key = Object.keys(woData)[0]; // Mendapatkan kunci pertama
   const value = woData[key]; // Mengambil nilai dari kunci pertama
 
+  // Mendapatkan bulan saat ini (0-11, jadi tambahkan 1 untuk mendapatkan 1-12)
+  const month = new Date().getMonth() + 1;
+
   const data = {
     woName: key, // Mengatur woName sesuai dengan nilai dari kunci pertama
     sumWo: value,
-    totalCalories: totalCalories.toFixed(1),
+    totalCalories: totalCalories.toFixed(1), // Mengonversi totalCalories menjadi string dengan 1 desimal
     userId: new ObjectId(userId),
+    month: month, // Menambahkan bulan ke data
   };
 
   const result = await db.collection(COLLECTION_NAME).insertOne(data);
@@ -47,26 +51,36 @@ export const getWoInfo = async (userId: string) => {
     .aggregate([{ $match: { userId: new ObjectId(userId) } }])
     .toArray();
 
-  // console.log(result, "++ cart ++");
-
   return result;
 };
 
-export async function deleteAllDocuments() {
-  const uri =
-    "mongodb+srv://masakbar2905:mei555@cluster0.ratubnl.mongodb.net/?retryWrites=true&w=majority"; // Ganti dengan URI Anda
-  const client = new MongoClient(uri);
+export const getTotalCaloriesByUser = async (userId: string) => {
+  const db = await getDb();
 
-  try {
-    await client.connect();
-    const database = client.db("Workout_AI"); // Ganti dengan nama database Anda
-    const collection = database.collection("workOutInfo"); // Ganti dengan nama collection Anda
+  const result = await db
+    .collection(COLLECTION_NAME)
+    .aggregate([
+      {
+        $match: {
+          userId: new ObjectId(userId), // Memfilter berdasarkan userId
+        },
+      },
+      {
+        $group: {
+          _id: { month: "$month" }, // Mengelompokkan berdasarkan bulan
+          totalCalories: { $sum: { $toDouble: "$totalCalories" } }, // Menjumlahkan total kalori
+        },
+      },
+      {
+        $project: {
+          _id: 0, // Tidak menyertakan _id
+          totalCalories: { $round: ["$totalCalories", 1] }, // Menghitung total kalori dengan 1 desimal
+          month: "$_id.month", // Menyertakan bulan dalam hasil
+        },
+      },
+    ])
+    .toArray();
 
-    const result = await collection.deleteMany({});
-    console.log(`${result.deletedCount} documents were deleted.`);
-  } finally {
-    await client.close();
-  }
-}
-
-deleteAllDocuments().catch(console.error);
+  // Mengembalikan hasil dalam format yang diinginkan
+  return result.length > 0 ? result : [];
+};

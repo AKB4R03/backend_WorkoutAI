@@ -52,3 +52,19 @@ export const getUserWeightById = async (userId: string) => {
     return null; // Mengembalikan null jika user tidak ditemukan
   }
 };
+
+export const getUserWeightByUserId = async (
+  userId: string
+): Promise<number | null> => {
+  const db = await getDb();
+  const user = await db
+    .collection(COLLECTION_NAME)
+    .findOne({ _id: new ObjectId(userId) });
+
+  // Memeriksa apakah user ditemukan
+  if (user) {
+    return user.weight; // Mengembalikan nilai weight dalam bentuk number
+  } else {
+    return null; // Mengembalikan null jika user tidak ditemukan
+  }
+};
