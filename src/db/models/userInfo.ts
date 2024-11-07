@@ -53,6 +53,15 @@ export const getUserWeightById = async (userId: string) => {
   }
 };
 
+export const getUserById = async (userId: string) => {
+  const db = await getDb();
+  const user = await db
+    .collection(COLLECTION_NAME)
+    .findOne({ _id: new ObjectId(userId) });
+
+  return user;
+};
+
 export const getUserWeightByUserId = async (
   userId: string
 ): Promise<number | null> => {
