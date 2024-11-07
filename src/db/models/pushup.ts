@@ -29,6 +29,7 @@ export const insertPushUpInfo = async (
 
   // Mendapatkan bulan saat ini (0-11, jadi tambahkan 1 untuk mendapatkan 1-12)
   const month = new Date().getMonth() + 1;
+  const year = new Date().getFullYear();
 
   const data = {
     woName: key, // Mengatur woName sesuai dengan nilai dari kunci pertama
@@ -36,6 +37,7 @@ export const insertPushUpInfo = async (
     totalCalories: totalCalories.toFixed(1), // Mengonversi totalCalories menjadi string dengan 1 desimal
     userId: new ObjectId(userId),
     month: month, // Menambahkan bulan ke data
+    year: year,
   };
 
   const result = await db.collection(COLLECTION_NAME).insertOne(data);
